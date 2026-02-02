@@ -102,7 +102,7 @@ Reference these guidelines when:
 
 ### 8. Best Practices (MEDIUM)
 
-- `best-create-new-contract` - Use latest SDK versions and proper project setup
+- `best-create-new-contract` - Use latest templates and SDK features for new contracts, remember run cargo near new
 - `best-neartoken-transfers` - Use `NearToken` type instead of raw `u128` for transfers
 - `best-panic-messages` - Provide clear, actionable panic messages
 - `best-logging` - Use `env::log_str()` for debugging and event emission

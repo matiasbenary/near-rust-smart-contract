@@ -1,13 +1,28 @@
 # Best Practice: Creating a New NEAR Contract
 
+Always start your NEAR smart contract projects by templating with the latest recommended versions and patterns.
 Always use the latest stable versions of packages and follow proper project setup when creating new NEAR smart contracts.
+
+If cargo-near not installed, install it via:
+
+- Install prebuilt binaries via shell script (Linux, macOS)
+
+```sh
+curl --proto '=https' --tlsv1.2 -LsSf https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.sh | sh
+```
+
+- Install prebuilt binaries via powershell script (Windows)
+
+```sh
+irm https://github.com/near/cargo-near/releases/latest/download/cargo-near-installer.ps1 | iex
+```
 
 ## CRITICAL: Always Check Latest Versions
 
 **MANDATORY**: Before creating ANY Cargo.toml file, you MUST run:
 
 ```bash
-cargo search near-sdk
+cargo near new
 ```
 
 This will show the current latest version. NEVER use hardcoded versions from examples or documentation - they become outdated quickly.
@@ -21,97 +36,7 @@ Using outdated dependencies can lead to:
 - **Performance problems** - Newer versions often include gas optimizations
 - **Deprecated patterns** - Old code patterns may stop working in future updates
 
-## ❌ Incorrect
-
-```toml
-# Cargo.toml with outdated/hardcoded versions
-[package]
-name = "my-contract"
-version = "0.1.0"
-edition = "2018"
-
-[lib]
-crate-type = ["cdylib"]
-
-[dependencies]
-near-sdk = "4.0.0"  # Outdated version!
-
-[profile.release]
-opt-level = "z"
-# Missing overflow-checks!
-```
-
-```rust
-// Using deprecated patterns from old SDK
-use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::collections::UnorderedMap;
-use near_sdk::{near_bindgen, AccountId};
-
-#[near_bindgen]
-#[derive(BorshDeserialize, BorshSerialize)]
-pub struct Contract {
-    data: UnorderedMap<AccountId, String>,
-}
-```
-
-**Problems:**
-- Using old SDK version with potential security issues
-- Missing `overflow-checks = true` in profile
-- Using deprecated `collections` module instead of `store`
-- Missing `PanicOnDefault` derive
-- Using old macro syntax
-
-## ✅ Correct
-
-### Step 1: Check Latest Versions Before Starting
-
-Always verify the latest versions:
-
-```bash
-# Check latest near-sdk version
-cargo search near-sdk
-
-# Or visit crates.io
-# https://crates.io/crates/near-sdk
-
-# Check NEAR documentation for recommended versions
-# https://docs.near.org/sdk/rust/introduction
-```
-
-### Step 2: Use Proper Cargo.toml
-
-```toml
-[package]
-name = "my-contract"
-version = "1.0.0"
-edition = "2026"
-authors = ["Your Name <your@email.com>"]
-description = "Description of your contract"
-
-[lib]
-crate-type = ["cdylib", "rlib"]
-
-[dependencies]
-# MANDATORY: Run `cargo search near-sdk` to get the latest version
-# NEVER use hardcoded versions from documentation - check crates.io!
-near-sdk = "X.Y.Z"  # Replace with result from `cargo search near-sdk`
-borsh = "lastest"  # Optional, if using Borsh serialization
-
-[dev-dependencies]
-near-sdk = { version = "X.Y.Z", features = ["unit-testing"] }  # Same version as above
-tokio = { version = "1", features = ["full"] }
-
-[profile.release]
-codegen-units = 1
-opt-level = "z"
-lto = true
-debug = false
-panic = "abort"
-# CRITICAL: Prevent integer overflow vulnerabilities
-overflow-checks = true
-```
-
-### Step 3: Use Modern SDK Patterns
+### Use Modern SDK Patterns
 
 ```rust
 use near_sdk::{near, env, AccountId, NearToken, PanicOnDefault};
